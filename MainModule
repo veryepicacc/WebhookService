@@ -1,29 +1,25 @@
-local WebhookService = {}
+--[[
+	Discord rate limits: 30 REQUESTS PER 60 SECONDS!!!
+	If the rate limits are not respected, there is a chance your discord account can get terminated for overrequesting.
+	If you break the rate limits for discord, there is a chance you could ruin it for everyone!
+	If terminated, it's not my fault.
+	Have fun.
+--]]
 
+local WebhookService = {}
+local WebhookServiceVariRPN = require(script:WaitForChild("RequestPostNum"))
+
+local ServerStorage = game:GetService("ServerStorage")
 local HttpService = game:GetService("HttpService")
 local CurrentRequestAmount = 0
 local CurrentRequestTime = 0
-local CanRequest = false
+local PrintPostNum = true
 
-task.spawn(function()
-	repeat wait(1)
-		if CurrentRequestTime == 61 then
-			if CurrentRequestAmount == 30 then
-				CanRequest = false
-				task.delay(61, function()
-					CanRequest = true
-					CurrentRequestTime = 0
-					CurrentRequestAmount = 0
-				end)
-			end
-			CurrentRequestTime = 0
-			CurrentRequestAmount = 0
-		end
-		CurrentRequestTime = CurrentRequestTime + 1
-	until nil
-end)
-
-local WebhookLink = "https://discord.com/api/"
+--[[
+	Webhook link (string) is put in through the Webhook : Setup function.
+	If you use different webhook link from the one you had previously put in, you may have to change it.
+--]]
+local WebhookLink = "https://discord.com/api/" --The default ("https://discord.com/api/") you see here is just a placeholder for when you add the webhook link.
 
 function WebhookService : Setup(webhook)
 	WebhookLink = webhook
@@ -31,10 +27,13 @@ end
 
 function WebhookService : GetWebhookInfo()
 	local Info = {WebhookLink}
-	
-	return Info, CanRequest
+	return Info
 end
 
+--[[
+	The PostWebhookFunc is the function that should have the debounce / cooldown to avoid discord request breaking.
+	Like said before, safeguard this function so that it doesn't overflow the discord rate limits.
+--]]
 function WebhookService : PostWebhookFunc(postContent, postType, embedData)
 	local Information = WebhookService : GetWebhookInfo()
 	
@@ -50,10 +49,35 @@ function WebhookService : PostWebhookFunc(postContent, postType, embedData)
 			end)
 			
 			if not success then
+				--The warn is for the sake of helping you figure out the error in the PostAsync request.
 				warn("WebhookService Post Attempt failed. " .. err)
 			else
-				if CurrentRequestAmount < 30 then
+				--The creation of the named Configuration instances are to help you know that there was a malfunction if the warn under mysterious circumstances does not appear.
+				if not ServerStorage:FindFirstChild("PostAmount") then
+					local PostAmount = Instance.new("Folder")
+					PostAmount.Name = "PostAmount"
+					PostAmount.Parent = ServerStorage
+				end
+				
+				if ServerStorage:FindFirstChild("PostAmount") then
 					CurrentRequestAmount = CurrentRequestAmount + 1
+					local PostRequest = Instance.new("Configuration")
+					PostRequest.Name = "PostRequest" .. tostring(CurrentRequestAmount)
+					PostRequest.Parent = ServerStorage:WaitForChild("PostAmount")
+					
+					PostRequest:SetAttribute("WebhookLink", tostring(WebhookLink))
+					PostRequest:SetAttribute("PostContent", tostring(postContent))
+				end
+				
+				if PrintPostNum then
+					local StringHelp, PostFolder = WebhookServiceVariRPN:RequestPostAmount()
+					
+					if tostring(StringHelp) == "PostAmount was not in ServerStorage." then
+						warn("PostAmount was not in ServerStorage, retrying.")
+					elseif tostring(StringHelp) == "Returned PostAmount folder." then
+						print("Returned PostAmount folder.")
+						print("Current Post Request Amount: " .. #PostFolder:GetChildren())
+					end
 				end
 			end
 		end
