@@ -1,0 +1,25 @@
+--Module for requesting the amount of post requests in the "PostAmount" folder in ServerStorage.
+
+local WebhookServiceVariRPN = {}
+
+local ServerStorage = game:GetService("ServerStorage")
+local PostAmount = nil
+if ServerStorage:FindFirstChild("PostAmount") then
+	PostAmount = ServerStorage:FindFirstChild("PostAmount")
+end
+
+function WebhookServiceVariRPN : RequestPostAmount()
+	if not PostAmount then
+		local PostAmount = Instance.new("Folder")
+		PostAmount.Name = "PostAmount"
+		PostAmount.Parent = ServerStorage
+		
+		return "PostAmount was not in ServerStorage."
+	else
+		local PostAmount = ServerStorage:FindFirstChild("PostAmount")
+
+		return "Returned PostAmount folder.", PostAmount
+	end
+end
+
+return WebhookServiceVariRPN
