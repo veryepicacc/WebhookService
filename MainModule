@@ -1,0 +1,63 @@
+local WebhookService = {}
+
+local HttpService = game:GetService("HttpService")
+local CurrentRequestAmount = 0
+local CurrentRequestTime = 0
+local CanRequest = false
+
+task.spawn(function()
+	repeat wait(1)
+		if CurrentRequestTime == 61 then
+			if CurrentRequestAmount == 30 then
+				CanRequest = false
+				task.delay(61, function()
+					CanRequest = true
+					CurrentRequestTime = 0
+					CurrentRequestAmount = 0
+				end)
+			end
+			CurrentRequestTime = 0
+			CurrentRequestAmount = 0
+		end
+		CurrentRequestTime = CurrentRequestTime + 1
+	until nil
+end)
+
+local WebhookLink = "https://discord.com/api/"
+
+function WebhookService : Setup(webhook)
+	WebhookLink = webhook
+end
+
+function WebhookService : GetWebhookInfo()
+	local Info = {WebhookLink}
+	
+	return Info, CanRequest
+end
+
+function WebhookService : PostWebhookFunc(postContent, postType, embedData)
+	local Information = WebhookService : GetWebhookInfo()
+	
+	if Information[1] ~= "https://discord.com/api/" or "https://discordapp.com/api/" then
+		if tostring(postType) == "Text" then
+			local PostTableData = {
+				["content"] = tostring(postContent),
+			}
+			
+			PostTableData = HttpService:JSONEncode(PostTableData)
+			local success, err = pcall(function()
+				return HttpService:PostAsync(tostring(WebhookLink), PostTableData)
+			end)
+			
+			if not success then
+				warn("WebhookService Post Attempt failed. " .. err)
+			else
+				if CurrentRequestAmount < 30 then
+					CurrentRequestAmount = CurrentRequestAmount + 1
+				end
+			end
+		end
+	end
+end
+
+return WebhookService
