@@ -1,5 +1,0 @@
-local ServerScriptService = game:GetService("ServerScriptService")
-local WebhookService = require(ServerScriptService:WaitForChild("WebhookService"))
-
-WebhookService:Setup("https://discord.com/api/webhooks/Webhook")
-WebhookService:PostWebhookFunc("Hi there.", "Text")
