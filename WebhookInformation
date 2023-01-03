@@ -18,4 +18,8 @@
 	To ping a certain role, put <@&role_id> (if you are confused on the role_id part, search on your browser "How to get role id for Discord?") in the first quotes of wherever WebhookService:PostWebhookFunc()
 	To mention a channel, put <#channel_id> in the first quotes of wherever WebhookService:PostWebhookFunc() is used. (if you are confused on the channel_id part, search on your browser "How to get channel id for Discord?")
 	To say an emoji, put <:emoji_name:emoji_id> in the first quotes of wherever WebhookService:PostWebhookFunc() is used. (if you are confused on the emoji_name:emoji_id part, search on your browser "How to get emoji id for Discord?")
+	
+	For embedding colors, this website is suggested for the color picking of it: https://www.htmlcsscolor.com/hex/FF0000.
+	The color in text must look something along the lines of this: 0xFF0000
+	You would put the color in something that looks like this: ["color"] = tonumber()
 --]]
