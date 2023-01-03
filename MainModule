@@ -80,6 +80,46 @@ function WebhookService : PostWebhookFunc(postContent, postType, embedData)
 					end
 				end
 			end
+		elseif tostring(postType) == "Embed" then
+			local PostTableData = embedData
+
+			PostTableData = HttpService:JSONEncode(PostTableData)
+			local success, err = pcall(function()
+				return HttpService:PostAsync(tostring(WebhookLink), PostTableData)
+			end)
+
+			if not success then
+				--The warn is for the sake of helping you figure out the error in the PostAsync request.
+				warn("WebhookService Post Attempt failed. " .. err)
+			else
+				--The creation of the named Configuration instances are to help you know that there was a malfunction if the warn under mysterious circumstances does not appear.
+				if not ServerStorage:FindFirstChild("PostAmount") then
+					local PostAmount = Instance.new("Folder")
+					PostAmount.Name = "PostAmount"
+					PostAmount.Parent = ServerStorage
+				end
+
+				if ServerStorage:FindFirstChild("PostAmount") then
+					CurrentRequestAmount = CurrentRequestAmount + 1
+					local PostRequest = Instance.new("Configuration")
+					PostRequest.Name = "PostRequest" .. tostring(CurrentRequestAmount)
+					PostRequest.Parent = ServerStorage:WaitForChild("PostAmount")
+
+					PostRequest:SetAttribute("WebhookLink", tostring(WebhookLink))
+					PostRequest:SetAttribute("PostContent", tostring(postContent))
+				end
+
+				if PrintPostNum then
+					local StringHelp, PostFolder = WebhookServiceVariRPN:RequestPostAmount()
+
+					if tostring(StringHelp) == "PostAmount was not in ServerStorage." then
+						warn("PostAmount was not in ServerStorage, retrying.")
+					elseif tostring(StringHelp) == "Returned PostAmount folder." then
+						print("Returned PostAmount folder.")
+						print("Current Post Request Amount: " .. #PostFolder:GetChildren())
+					end
+				end
+			end
 		end
 	end
 end
