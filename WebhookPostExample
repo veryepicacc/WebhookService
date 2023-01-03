@@ -5,13 +5,13 @@ local WebhookService = require(ServerScriptService:WaitForChild("WebhookService"
 local EmbedData = {
 	["content"] = "",
 	["embeds"] = {{
-		["title"] = "Title here",
+		["title"] = "Embedding Discord API Test",
 		["description"] = "Text Here",
 		["type"] = "rich",
-		["color"] = tonumber(0xffffff),
+		["color"] = tonumber(0xFF0000),
 	}}
 }
 
 WebhookService:Setup("https://discord.com/api/webhooks/Webhook")
-WebhookService:PostWebhookFunc("Hi there!", "Text", nil) --Normal Text
+WebhookService:PostWebhookFunc("Greetings!", "Text", nil) --Text
 WebhookService:PostWebhookFunc(nil, "Embed", EmbedData) --Embedding
