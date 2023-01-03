@@ -1,0 +1,21 @@
+--[[
+	Other info that may help you with the WebhookService.
+	
+	Setting up the webhook bot from Discord itself:
+	1. Open your discord server
+	2. Select any channel, press the cog / settings icon on that channel (assuming you have permissions to do so.)
+	3. Go down to integrations.
+	4. Select "Create Webhook"
+	5. Name it and set the profile picture as you please. (not responsible if you put an inappropriate name or pfp and get moderated in some way.)
+	6. Copy the webhook url and place it in the first argument wherever WebhookService:Setup() is used.
+	7. The rest of the webhooking is done for you.
+	
+	Discord has rate limits for Post Requests and expects you as a developer to respect them.
+	Post Request Rate Limits: 30 requests per 60 seconds
+	
+	You can use user functions like you would as a discord user, but in a different way for WebhookService:
+	To ping users, put <@user_id> in the first quotes of wherever WebhookService:PostWebhookFunc() is used. (if you are confused on the user_id part, search on your browser "How to get user id for Discord?")
+	To ping a certain role, put <@&role_id> (if you are confused on the role_id part, search on your browser "How to get role id for Discord?") in the first quotes of wherever WebhookService:PostWebhookFunc()
+	To mention a channel, put <#channel_id> in the first quotes of wherever WebhookService:PostWebhookFunc() is used. (if you are confused on the channel_id part, search on your browser "How to get channel id for Discord?")
+	To say an emoji, put <:emoji_name:emoji_id> in the first quotes of wherever WebhookService:PostWebhookFunc() is used. (if you are confused on the emoji_name:emoji_id part, search on your browser "How to get emoji id for Discord?")
+--]]
