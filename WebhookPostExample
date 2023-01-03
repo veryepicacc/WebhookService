@@ -12,6 +12,6 @@ local EmbedData = {
 	}}
 }
 
-WebhookService:Setup("https://discord.com/api/webhooks/1059620450977722449/CKWn_PXIeNbHZ762D-fCf90I6zf5X68_N2UTp0UCu_N1orteN1epvWcRzyR49LEhfaTF")
+WebhookService:Setup("https://discord.com/api/webhooks/Webhook")
 WebhookService:PostWebhookFunc("Hi there!", "Text", nil) --Normal Text
 WebhookService:PostWebhookFunc(nil, "Embed", EmbedData) --Embedding
