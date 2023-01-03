@@ -3,13 +3,8 @@
 local WebhookServiceVariRPN = {}
 
 local ServerStorage = game:GetService("ServerStorage")
-local PostAmount = nil
-if ServerStorage:FindFirstChild("PostAmount") then
-	PostAmount = ServerStorage:FindFirstChild("PostAmount")
-end
-
 function WebhookServiceVariRPN : RequestPostAmount()
-	if not PostAmount then
+	if not ServerStorage:FindFirstChild("PostAmount") then
 		local PostAmount = Instance.new("Folder")
 		PostAmount.Name = "PostAmount"
 		PostAmount.Parent = ServerStorage
