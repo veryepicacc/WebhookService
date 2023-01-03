@@ -1,14 +1,24 @@
+--[[
+	Refer to the WebhookInformation ModuleScript for more info on customization for messages.
+--]]
+
 local ServerScriptService = game:GetService("ServerScriptService")
 local WebhookService = require(ServerScriptService:WaitForChild("WebhookService"))
 
---You can customize the title, description, or color.
 local EmbedData = {
 	["content"] = "",
 	["embeds"] = {{
-		["title"] = "Embedding Discord API Test",
+		["title"] = "Title Here",
 		["description"] = "Text Here",
 		["type"] = "rich",
 		["color"] = tonumber(0xFF0000),
+		["footer"] = {
+			icon_url = "https://saferschoolsni.co.uk/wp-content/uploads/2021/09/Roblox_Icon.png",
+			text = "From @Anyone | " .. DateTime.now():FormatLocalTime("LL", "en-us") .. " at " .. DateTime.now():FormatLocalTime("LT", "en-us")
+		},
+		["thumbnail"] = {
+			url = "https://saferschoolsni.co.uk/wp-content/uploads/2021/09/Roblox_Icon.png"
+		},
 	}}
 }
 
