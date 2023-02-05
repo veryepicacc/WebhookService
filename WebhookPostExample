@@ -1,9 +1,15 @@
 --[[
-	Refer to the WebhookInformation ModuleScript for more info on customization for messages.
+	Discord rate limits: 30 REQUESTS PER 60 SECONDS!!!
+	If the rate limits are not respected, there is a chance your discord account can get terminated for overrequesting.
+	If you break the rate limits for discord, there is a chance you could ruin it for everyone!
+	If terminated, it's not my fault.
+	Have fun.
+	
+	Refer to the WebhookInformation ModuleScript parented to this script for more info on customization for messages.
 --]]
 
 local ServerScriptService = game:GetService("ServerScriptService")
-local WebhookService = require(ServerScriptService:WaitForChild("WebhookService"))
+local WebhookService = require(12395759414) or require(ServerScriptService:WaitForChild("WebhookService"))
 
 local EmbedData = {
 	["content"] = "",
@@ -22,6 +28,14 @@ local EmbedData = {
 	}}
 }
 
-WebhookService:Setup("https://discord.com/api/webhooks/Webhook")
-WebhookService:PostWebhookFunc("Greetings!", "Text", nil) --Text
-WebhookService:PostWebhookFunc(nil, "Embed", EmbedData) --Embedding
+WebhookService:Setup("https://discord.com/api/Webhook")
+local TextErr = WebhookService:PostWebhookFunc("Greetings!", "Text", nil) --Text
+local EmbedErr = WebhookService:PostWebhookFunc(nil, "Embed", EmbedData, "Title of embed here!") --Embedding
+
+if TextErr ~= nil then
+	warn(TextErr)
+end
+
+if EmbedErr ~= nil then
+	warn(EmbedErr)
+end
