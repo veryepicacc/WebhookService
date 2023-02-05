@@ -7,19 +7,17 @@
 --]]
 
 local WebhookService = {}
-local WebhookServiceVariRPN = require(script:WaitForChild("RequestPostNum"))
 
-local ServerStorage = game:GetService("ServerStorage")
-local HttpService = game:GetService("HttpService")
-local CurrentRequestAmount = 0
-local CurrentRequestTime = 0
-local PrintPostNum = true
+local ServerStorage : ServerStorage = game:GetService("ServerStorage")
+local HttpService : HttpService = game:GetService("HttpService")
+local CurrentRequestDebounce : string = false
+
 
 --[[
 	Webhook link (string) is put in through the Webhook : Setup function.
 	If you use different webhook link from the one you had previously put in, you may have to change it.
 --]]
-local WebhookLink = "https://discord.com/api/" --The default ("https://discord.com/api/") you see here is just a placeholder for when you add the webhook link.
+local WebhookLink : string = "https://discord.com/api/" --The default ("https://discord.com/api/") you see here is just a placeholder for when you add the webhook link.
 
 function WebhookService : Setup(webhook)
 	WebhookLink = webhook
@@ -33,92 +31,55 @@ end
 --[[
 	The PostWebhookFunc is the function that should have the debounce / cooldown to avoid discord request breaking.
 	Like said before, safeguard this function so that it doesn't overflow the discord rate limits.
+	I have added a sample debounce for you to make your own systems.
 --]]
-function WebhookService : PostWebhookFunc(postContent, postType, embedData)
+function WebhookService : PostWebhookFunc(postContent, postType, embedData, embedTitle)
 	local Information = WebhookService : GetWebhookInfo()
-	
+
 	if Information[1] ~= "https://discord.com/api/" or "https://discordapp.com/api/" then
 		if tostring(postType) == "Text" then
-			local PostTableData = {
-				["content"] = tostring(postContent),
-			}
-			
-			PostTableData = HttpService:JSONEncode(PostTableData)
-			local success, err = pcall(function()
-				return HttpService:PostAsync(tostring(WebhookLink), PostTableData)
-			end)
-			
-			if not success then
-				--The warn is for the sake of helping you figure out the error in the PostAsync request.
-				warn("WebhookService Post Attempt failed. " .. err)
+			if CurrentRequestDebounce == false then
+				local PostTableData = {
+					["content"] = tostring(postContent),
+				}
+
+				PostTableData = HttpService:JSONEncode(PostTableData)
+				local success, err = pcall(function()
+					return HttpService:PostAsync(tostring(WebhookLink), PostTableData)
+				end)
+
+				if not success then
+					--The warn is for the sake of helping you figure out the error in the PostAsync request.
+					warn("WebhookService Post Attempt failed. " .. err)
+				else
+					CurrentRequestDebounce = true
+					task.delay(5, function()
+						CurrentRequestDebounce = false
+					end)
+				end
 			else
-				--The creation of the named Configuration instances are to help you know that there was a malfunction if the warn under mysterious circumstances does not appear.
-				if not ServerStorage:FindFirstChild("PostAmount") then
-					local PostAmount = Instance.new("Folder")
-					PostAmount.Name = "PostAmount"
-					PostAmount.Parent = ServerStorage
-				end
-				
-				if ServerStorage:FindFirstChild("PostAmount") then
-					CurrentRequestAmount = CurrentRequestAmount + 1
-					local PostRequest = Instance.new("Configuration")
-					PostRequest.Name = "PostRequest" .. tostring(CurrentRequestAmount)
-					PostRequest.Parent = ServerStorage:WaitForChild("PostAmount")
-					
-					PostRequest:SetAttribute("WebhookLink", tostring(WebhookLink))
-					PostRequest:SetAttribute("PostContent", tostring(postContent))
-				end
-				
-				if PrintPostNum then
-					local StringHelp, PostFolder = WebhookServiceVariRPN:RequestPostAmount()
-					
-					if tostring(StringHelp) == "PostAmount was not in ServerStorage." then
-						warn("PostAmount was not in ServerStorage, retrying.")
-					elseif tostring(StringHelp) == "Returned PostAmount folder." then
-						print("Returned PostAmount folder.")
-						print("Current Post Request Amount: " .. #PostFolder:GetChildren())
-					end
-				end
+				return "Post request limit has been reached, try again in a bit. Message: " .. tostring(postContent)
 			end
 		elseif tostring(postType) == "Embed" then
-			local PostTableData = embedData
+			if CurrentRequestDebounce == false then
+				local PostTableData = embedData
 
-			PostTableData = HttpService:JSONEncode(PostTableData)
-			local success, err = pcall(function()
-				return HttpService:PostAsync(tostring(WebhookLink), PostTableData)
-			end)
+				PostTableData = HttpService:JSONEncode(PostTableData)
+				local success, err = pcall(function()
+					return HttpService:PostAsync(tostring(WebhookLink), PostTableData)
+				end)
 
-			if not success then
-				--The warn is for the sake of helping you figure out the error in the PostAsync request.
-				warn("WebhookService Post Attempt failed. " .. err)
+				if not success then
+					--The warn is for the sake of helping you figure out the error in the PostAsync request.
+					warn("WebhookService Post Attempt failed. " .. err)
+				else
+					CurrentRequestDebounce = true
+					task.delay(5, function()
+						CurrentRequestDebounce = false
+					end)
+				end
 			else
-				--The creation of the named Configuration instances are to help you know that there was a malfunction if the warn under mysterious circumstances does not appear.
-				if not ServerStorage:FindFirstChild("PostAmount") then
-					local PostAmount = Instance.new("Folder")
-					PostAmount.Name = "PostAmount"
-					PostAmount.Parent = ServerStorage
-				end
-
-				if ServerStorage:FindFirstChild("PostAmount") then
-					CurrentRequestAmount = CurrentRequestAmount + 1
-					local PostRequest = Instance.new("Configuration")
-					PostRequest.Name = "PostRequest" .. tostring(CurrentRequestAmount)
-					PostRequest.Parent = ServerStorage:WaitForChild("PostAmount")
-
-					PostRequest:SetAttribute("WebhookLink", tostring(WebhookLink))
-					PostRequest:SetAttribute("PostContent", tostring(postContent))
-				end
-
-				if PrintPostNum then
-					local StringHelp, PostFolder = WebhookServiceVariRPN:RequestPostAmount()
-
-					if tostring(StringHelp) == "PostAmount was not in ServerStorage." then
-						warn("PostAmount was not in ServerStorage, retrying.")
-					elseif tostring(StringHelp) == "Returned PostAmount folder." then
-						print("Returned PostAmount folder.")
-						print("Current Post Request Amount: " .. #PostFolder:GetChildren())
-					end
-				end
+				return "Post request limit has been reached, try again in a bit. Embed message: " .. embedTitle
 			end
 		end
 	end
